@@ -5,17 +5,9 @@ pkgs:
 , extraSpecialArgs ? { }
 }:
 let
-  devenvModules = import ./modules.nix {
-    inherit pkgs lib;
-  };
+  eval = import ./eval.nix { inherit pkgs lib extraSpecialArgs; };
 
-  module = lib.evalModules {
-    modules = [ configuration ] ++ devenvModules;
-    specialArgs = {
-      modulesPath = builtins.toString ./.;
-      extraModulesPath = builtins.toString ../extra;
-    } // extraSpecialArgs;
-  };
+  module = eval.evalModule configuration;
 in
 {
   inherit (module) config options;
