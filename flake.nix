@@ -40,6 +40,40 @@
       lib = {
         importTOML = import ./nix/importTOML.nix;
       };
+      flakeModule = { lib, ... }:
+        let inherit (lib)
+          mkOption types;
+        in
+        {
+          config = {
+            perSystem = system: { config, inputs', ... }: {
+              options = {
+                devshell.pkgs = mkOption {
+                  description = "Nixpkgs to use in devshell.";
+                  type = types.lazyAttrsOf types.unspecified;
+                  default = inputs'.nixpkgs.legacyPackages;
+                  defaultText = lib.literalExpression or lib.literalExample ''
+                    inputs'.nixpkgs.legacyPackages
+                  '';
+                };
+                devshell.settings = mkOption {
+                  description = "devshell options. See https://github.com/numtide/devshell";
+                  # See https://github.com/numtide/devshell/blob/d36e4ba27668f1620a5adebf5e0c724213a0f157/modules/default.nix
+                  type =
+                    (import ./modules/eval.nix {
+                      inherit (config.devshell) pkgs;
+                      inherit lib;
+                    }).type;
+                  default = { };
+                };
+              };
+              config = {
+                devShell = config.devshell.settings.devshell.shell;
+                checks.devshell = config.devshell.settings.devshell.shell;
+              };
+            };
+          };
+        };
     }
     //
     eachSystem forSystem;
