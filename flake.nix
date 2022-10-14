@@ -46,7 +46,7 @@
         in
         {
           config = {
-            perSystem = system: { config, inputs', ... }: {
+            perSystem = { config, inputs', ... }: {
               options = {
                 devshell.pkgs = mkOption {
                   description = "Nixpkgs to use in devshell.";
