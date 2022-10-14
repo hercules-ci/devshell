@@ -66,9 +66,16 @@
                     }).type;
                   default = { };
                 };
+                devshell.name = mkOption {
+                  default = "default";
+                  description = ''
+                    Which name to use when writing to the flake `perSystem.devShells.<name>`.
+                  '';
+                  type = types.str;
+                };
               };
               config = {
-                devShell = config.devshell.settings.devshell.shell;
+                devShells.${config.devshell.name} = config.devshell.settings.devshell.shell;
                 checks.devshell = config.devshell.settings.devshell.shell;
               };
             };
